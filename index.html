@@ -17,36 +17,33 @@
             color: #000;
         }
 
-        /* Header and Footer Styling */
+        /* Table header styling */
         th {
-            background-color: #e0e0e0; /* Light grey background for headers */
-            color: #b00; /* Dark Red text for headers */
+            background-color: #e0e0e0;
+            color: #b00;
             font-weight: bold;
             padding: 5px 10px;
-            text-align: right; /* Default align right for stats */
+            text-align: right;
             border: 1px solid #ccc;
         }
 
-        /* The first column header "Tm" should be left aligned */
         th:first-child {
             text-align: left;
             background-color: #e0e0e0;
-            color: #000; /* "Tm" is usually black or dark */
+            color: #000;
         }
 
-        /* Footer specific styling (tfoot) to match the header look */
         tfoot th {
-            border-top: 2px solid #000; /* Thicker line separating footer */
+            border-top: 2px solid #000;
         }
 
-        /* Data Cell Styling */
+        /* Table data cells */
         td {
             padding: 5px 10px;
             text-align: right;
-            border: 1px solid #e0e0e0; /* Faint grid lines */
+            border: 1px solid #e0e0e0;
         }
 
-        /* First Column (Team Names) Styling */
         td:first-child {
             text-align: left;
             font-weight: normal;
@@ -54,12 +51,10 @@
             background-color: #fff;
         }
 
-        /* Hover effect for better readability */
         tr:hover td {
             background-color: #f5f5f5;
         }
 
-        /* The diagonal "--" styling */
         .dash {
             color: #666;
             text-align: center;
@@ -73,23 +68,18 @@
     <script>
         async function loadAndBuildTable() {
             try {
-                // 1. Fetch the local JSON file
+                // Fetch and parse data
                 const response = await fetch('data.json');
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                // The data is an object where keys are teams: { "BRO": { ... }, "BSN": { ... } }
                 const data = await response.json();
-
-                // 2. Extract Team List (Sorted Alphabetically)
                 const teams = Object.keys(data).sort();
-
-                // 3. Create Table Element
                 const table = document.createElement("table");
 
-                // --- HEADER ---
+                // Build table header
                 const thead = document.createElement("thead");
                 const headerRow = document.createElement("tr");
                 
@@ -107,37 +97,25 @@
                 thead.appendChild(headerRow);
                 table.appendChild(thead);
 
-                // --- BODY ---
+                // Build table body with win data
                 const tbody = document.createElement("tbody");
                 
                 teams.forEach(rowTeam => {
                     const tr = document.createElement("tr");
 
-                    // First Column: Team Name
                     const tdName = document.createElement("td");
                     tdName.innerText = rowTeam;
                     tr.appendChild(tdName);
 
-                    // Data Columns
                     teams.forEach(colTeam => {
                         const td = document.createElement("td");
                         
                         if (rowTeam === colTeam) {
-                            // Diagonal cell (Team vs Themselves)
                             td.innerText = "--";
                             td.classList.add("dash");
                         } else {
-                            // Lookup logic for your specific JSON structure:
-                            // data["BRO"]["BSN"] -> { 'W': 10, 'L': 12 }
-                            
-                            // Check if the opponent exists in the record
                             const matchup = data[rowTeam] && data[rowTeam][colTeam];
-                            
-                            if (matchup) {
-                                td.innerText = matchup.W; // Display only Wins
-                            } else {
-                                td.innerText = "0"; // Default to 0 if no record found
-                            }
+                            td.innerText = matchup ? matchup.W : "0";
                         }
                         tr.appendChild(td);
                     });
@@ -145,24 +123,23 @@
                 });
                 table.appendChild(tbody);
 
-                // --- FOOTER (Matches Header) ---
+                // Add footer
                 const tfoot = document.createElement("tfoot");
                 const footerRow = headerRow.cloneNode(true);
                 tfoot.appendChild(footerRow);
                 table.appendChild(tfoot);
 
-                // 4. Clear loading text and append table
+                // Render table to page
                 const container = document.getElementById("table-container");
                 container.innerHTML = "";
                 container.appendChild(table);
 
             } catch (error) {
                 console.error("Error loading table:", error);
-                document.getElementById("table-container").innerText = "Error loading data.json. Make sure you are running this on a Live Server and your JSON is valid (use double quotes!).";
+                document.getElementById("table-container").innerText = "Error loading data.json. Ensure you're using a live server.";
             }
         }
 
-        // Run the function
         loadAndBuildTable();
     </script>
 </body>
